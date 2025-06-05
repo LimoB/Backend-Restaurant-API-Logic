@@ -135,6 +135,38 @@ export const menu_item = pgTable("menu_item", {
   updated_at: timestamp("updated_at").defaultNow(),
 });
 
+// Orders Table
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  actual_delivery_time: timestamp("actual_delivery_time"),//.nullable(),
+  restaurant_id: integer("restaurant_id").references(() => restaurant.id).notNull(),
+  delivery_address_id: integer("delivery_address_id")
+    .references(() => address.id)
+    .notNull(),
+  user_id: integer("user_id").references(() => users.id).notNull(),
+  driver_id: integer("driver_id").references(() => driver.id),//.nullable(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  discount: decimal("discount", { precision: 10, scale: 2 }).default("0").notNull(),
+  final_price: decimal("final_price", { precision: 10, scale: 2 }).notNull(),
+  comment: text("comment").default(""),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+// Comment Table
+export const comment = pgTable("comment", {
+  id: serial("id").primaryKey(),
+  order_id: integer("order_id")
+    .references(() => orders.id, { onDelete: "cascade" })
+    .notNull(),
+  user_id: integer("user_id").references(() => users.id).notNull(),
+  comment: text("comment").notNull(),
+  rating: integer("rating").notNull(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
 // Order Menu Item Table
 export const order_menu_item = pgTable("order_menu_item", {
   id: serial("id").primaryKey(),
@@ -153,6 +185,24 @@ export const order_menu_item = pgTable("order_menu_item", {
 //end of caleb tables
 
 
+// Status Catalog Table
+export const status_catalog = pgTable("status_catalog", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+});
+
+// Order Status Table
+export const order_status = pgTable("order_status", {
+  id: serial("id").primaryKey(),
+  order_id: integer("order_id").references(() => orders.id).notNull(),
+  status_catalog_id: integer("status_catalog_id")
+    .references(() => status_catalog.id)
+    .notNull(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+
 
 
 // Infer Types
@@ -162,6 +212,10 @@ export type TUserSelect = typeof users.$inferSelect;
 //start of caleb types
 export type TCategoryInsert = typeof category.$inferInsert;
 export type TCategorySelect = typeof category.$inferSelect;
+
+//chela
+export type TOrdersInsert = typeof orders.$inferInsert;
+export type TOrdersSelect = typeof orders.$inferSelect;
 
 export type TMenuItemInsert = typeof menu_item.$inferInsert;
 export type TMenuItemSelect = typeof menu_item.$inferSelect;
@@ -182,6 +236,18 @@ export type TCitySelect = typeof city.$inferSelect;
 
 export type TAddressInsert = typeof address.$inferInsert;
 export type TAddressSelect = typeof address.$inferSelect;
+
+
+//chela...
+
+export type TOrderStatusInsert = typeof order_status.$inferInsert;
+export type TOrderStatusSelect = typeof order_status.$inferSelect;
+
+export type TStatusCatalogInsert = typeof status_catalog.$inferInsert;
+export type TStatusCatalogSelect = typeof status_catalog.$inferSelect;
+
+export type TCommentInsert = typeof comment.$inferInsert;
+export type TCommentSelect = typeof comment.$inferSelect;
 
 
 // Relations
