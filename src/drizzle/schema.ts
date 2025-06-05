@@ -13,12 +13,12 @@ import {
 } from "drizzle-orm/pg-core";
 
 // Status Enum for order status tracking
-// export const statusEnum = pgEnum("status_enum", [
-//   "pending",
-//   "accepted",
-//   "rejected",
-//   "delivered",
-// ]);
+export const statusEnum = pgEnum("status_enum", [
+  "pending",
+  "accepted",
+  "rejected",
+  "delivered",
+]);
 
 // Role Enum for user authorization roles
 export const userTypeEnum = pgEnum("user_type", [
@@ -61,9 +61,6 @@ export const address = pgTable("address", {
 
 
 
-
-
-
 // Users Table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -95,9 +92,17 @@ export const driver = pgTable("driver", {
   updated_at: timestamp("updated_at").defaultNow(),
 });
 
-//caleb added tables
 
-//start of caleb tables
+// Restaurant Owner Table
+export const restaurant_owner = pgTable("restaurant_owner", {
+  id: serial("id").primaryKey(),
+  restaurant_id: integer("restaurant_id")
+    .references(() => restaurant.id, { onDelete: "cascade" })
+    .notNull(),
+  owner_id: integer("owner_id").references(() => users.id).notNull(),
+});
+
+
 
 // Restaurant Table
 export const restaurant = pgTable("restaurant", {
@@ -105,7 +110,7 @@ export const restaurant = pgTable("restaurant", {
   name: text("name").notNull(),
   street_address: text("street_address").notNull(),
   zip_code: varchar("zip_code", { length: 20 }).notNull(),
-  city_id: integer("city_id"), //.references(() => city.id).notNull(),
+  city_id: integer("city_id").references(() => city.id).notNull(),
   contact_phone: varchar("contact_phone", { length: 20 }).default(""),
   contact_email: varchar("contact_email", { length: 255 }).default(""),
   created_at: timestamp("created_at").defaultNow(),
@@ -170,8 +175,7 @@ export const comment = pgTable("comment", {
 // Order Menu Item Table
 export const order_menu_item = pgTable("order_menu_item", {
   id: serial("id").primaryKey(),
-  order_id: integer("order_id").notNull(),
-  //.references(() => orders.id),
+  order_id: integer("order_id").references(() => orders.id).notNull(),
   menu_item_id: integer("menu_item_id")
     .references(() => menu_item.id)
     .notNull(),
@@ -249,56 +253,134 @@ export type TStatusCatalogSelect = typeof status_catalog.$inferSelect;
 export type TCommentInsert = typeof comment.$inferInsert;
 export type TCommentSelect = typeof comment.$inferSelect;
 
+export type TRestaurantOwnerInsert = typeof restaurant_owner.$inferInsert;
+export type TRestaurantOwnerSelect = typeof restaurant_owner.$inferSelect;
+
+
+
+export type TOrderMenuItemInsert = typeof order_menu_item.$inferInsert;
+export type TOrderMenuItemSelect = typeof order_menu_item.$inferSelect;
+
+
+
 
 // Relations
 
-//start of caleb relations
-//caleb added relations below
+export const cityStateRelation = relations(city, ({ one }) => ({
+  state: one(state, {
+    fields: [city.state_id],
+    references: [state.id],
+  }),
+}));
 
+export const addressCityRelation = relations(address, ({ one }) => ({
+  city: one(city, {
+    fields: [address.city_id],
+    references: [city.id],
+  }),
+}));
 
-// export const restaurantOwnerRestaurantRelation = relations(restaurant_owner, ({ one }) => ({
-//   restaurant: one(restaurant, {
-//     fields: [restaurant_owner.restaurant_id],
-//     references: [restaurant.id],
-//   }),
-// }));
+export const menuItemCategoryRelation = relations(menu_item, ({ one }) => ({
+  category: one(category, {
+    fields: [menu_item.category_id],
+    references: [category.id],
+  }),
+}));
 
-// export const restaurantCityRelation = relations(restaurant, ({ one }) => ({
-//   city: one(city, {
-//     fields: [restaurant.city_id],
-//     references: [city.id],
-//   }),
-// }));
+export const menuItemRestaurantRelation = relations(menu_item, ({ one }) => ({
+  restaurant: one(restaurant, {
+    fields: [menu_item.restaurant_id],
+    references: [restaurant.id],
+  }),
+}));
 
-// export const menuItemRestaurantRelation = relations(menu_item, ({ one }) => ({
-//   restaurant: one(restaurant, {
-//     fields: [menu_item.restaurant_id],
-//     references: [restaurant.id],
-//   }),
-// }));
+export const restaurantCityRelation = relations(restaurant, ({ one }) => ({
+  city: one(city, {
+    fields: [restaurant.city_id],
+    references: [city.id],
+  }),
+}));
 
-// export const menuItemCategoryRelation = relations(menu_item, ({ one }) => ({
-//   category: one(category, {
-//     fields: [menu_item.category_id],
-//     references: [category.id],
-//   }),
-// }));
+export const restaurantOwnerUserRelation = relations(restaurant_owner, ({ one }) => ({
+  owner: one(users, {
+    fields: [restaurant_owner.owner_id],
+    references: [users.id],
+  }),
+}));
 
-// export const orderMenuItemMenuItemRelation = relations(order_menu_item, ({ one }) => ({
-//   menu_item: one(menu_item, {
-//     fields: [order_menu_item.menu_item_id],
-//     references: [menu_item.id],
-//   }),
-// }));
+export const restaurantOwnerRestaurantRelation = relations(restaurant_owner, ({ one }) => ({
+  restaurant: one(restaurant, {
+    fields: [restaurant_owner.restaurant_id],
+    references: [restaurant.id],
+  }),
+}));
 
-// export const orderMenuItemOrderRelation = relations(order_menu_item, ({ one }) => ({
-//   order: one(orders, {
-//     fields: [order_menu_item.order_id],
-//     references: [orders.id],
-//   }),
-// }));
+export const ordersUserRelation = relations(orders, ({ one }) => ({
+  user: one(users, {
+    fields: [orders.user_id],
+    references: [users.id],
+  }),
+}));
 
-// end of calebs relations
+export const ordersDriverRelation = relations(orders, ({ one }) => ({
+  driver: one(driver, {
+    fields: [orders.driver_id],
+    references: [driver.id],
+  }),
+}));
 
+export const ordersRestaurantRelation = relations(orders, ({ one }) => ({
+  restaurant: one(restaurant, {
+    fields: [orders.restaurant_id],
+    references: [restaurant.id],
+  }),
+}));
 
+export const ordersDeliveryAddressRelation = relations(orders, ({ one }) => ({
+  delivery_address: one(address, {
+    fields: [orders.delivery_address_id],
+    references: [address.id],
+  }),
+}));
 
+export const commentOrderRelation = relations(comment, ({ one }) => ({
+  order: one(orders, {
+    fields: [comment.order_id],
+    references: [orders.id],
+  }),
+}));
+
+export const commentUserRelation = relations(comment, ({ one }) => ({
+  user: one(users, {
+    fields: [comment.user_id],
+    references: [users.id],
+  }),
+}));
+
+export const orderMenuItemMenuItemRelation = relations(order_menu_item, ({ one }) => ({
+  menu_item: one(menu_item, {
+    fields: [order_menu_item.menu_item_id],
+    references: [menu_item.id],
+  }),
+}));
+
+export const orderMenuItemOrderRelation = relations(order_menu_item, ({ one }) => ({
+  order: one(orders, {
+    fields: [order_menu_item.order_id],
+    references: [orders.id],
+  }),
+}));
+
+export const orderStatusOrderRelation = relations(order_status, ({ one }) => ({
+  order: one(orders, {
+    fields: [order_status.order_id],
+    references: [orders.id],
+  }),
+}));
+
+export const orderStatusStatusCatalogRelation = relations(order_status, ({ one }) => ({
+  status_catalog: one(status_catalog, {
+    fields: [order_status.status_catalog_id],
+    references: [status_catalog.id],
+  }),
+}));
