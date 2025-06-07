@@ -1,11 +1,11 @@
-
 import { Router } from "express";
 import {
   createUser,
   loginUser,
   requestPasswordReset,
   resetPassword,
-} from "./auth.controller"; // ✅ Remove `.js` if you're using TypeScript
+  verifyEmail, // ✅ Import verify controller
+} from "./auth.controller";
 
 export const authRouter = Router();
 
@@ -20,3 +20,8 @@ authRouter.post("/auth/request-reset", requestPasswordReset);
 
 // 🔁 Reset password using token
 authRouter.post("/auth/reset-password", resetPassword);
+
+// 📧 Verify email with code
+// authRouter.get("/auth/verify-email", verifyEmail); 
+authRouter.post('/auth/verify-email', verifyEmail);
+
