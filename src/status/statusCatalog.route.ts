@@ -1,18 +1,27 @@
 import { Router } from "express";
-import {
-  getStatuses,
-  getStatusById,
-  createStatus,
-  updateStatus,
-  deleteStatus,
+import { 
+  createStatus, 
+  deleteStatus, 
+  getStatuses, 
+  getStatusById, 
+  updateStatus 
 } from "./statusCatalog.controller";
 
-const router = Router();
+export const statusRouter = Router();
 
-router.get("/statuses", getStatuses);
-router.get("/statuses/:id", getStatusById);
-router.post("/statuses", createStatus);
-router.put("/statuses/:id", updateStatus);
-router.delete("/statuses/:id", deleteStatus);
+// Status routes definition
 
-export default router;
+// Get all statuses
+statusRouter.get('/status', getStatuses);
+
+// Get status by ID
+statusRouter.get('/status/:id', getStatusById);
+
+// Create a new status
+statusRouter.post('/status', createStatus);
+
+// Update an existing status
+statusRouter.put('/status/:id', updateStatus);
+
+// Delete an existing status
+statusRouter.delete('/status/:id', deleteStatus);
