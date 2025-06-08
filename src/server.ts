@@ -12,6 +12,10 @@ import { cityRouter } from "./city/city.route";
 import { statusRouter } from "./status/statusCatalog.route";
 import orderRouter from "./orders/orders.route";
 import { driverRouter } from "./driver/driver.route";
+import { restaurantRouter } from "./restaurant/restaurant.route";
+import { orderMenuItemRouter } from "./order_menu_item/order_menu_item.route";
+import { menuItemRouter } from "./menu_item/menu_item.route";
+import { categoryRouter } from "./category/category.route";
 
 dotenv.config();
 
@@ -40,6 +44,11 @@ app.use("/api", authRouter);
 app.use("/api", statusRouter);
 
 app.use("/api", driverRouter);
+
+app.use("/api", restaurantRouter);
+app.use("/api", orderMenuItemRouter);
+app.use("/api", menuItemRouter);
+app.use("/api", categoryRouter);
 
 //Start server
 
