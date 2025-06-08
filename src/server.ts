@@ -8,6 +8,20 @@ import { authRouter } from "./auth/auth.route";
 import { RateLimiterMiddleware } from "./middleware/rateLimiter";
 import  statusRouter  from "./status/statusCatalog.route";
 import  orderRouter from "./orders/orders.route";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { driverRouter } from "./driver/driver.route";
 import { addressRouter } from "./address/address.route";
  
