@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { 
-  createStatus, 
-  deleteStatus, 
-  getStatuses, 
-  getStatusById, 
-  updateStatus 
+  getOrderStatuses,
+  getOrderStatusById,
+  createOrderStatus,
+  updateOrderStatus,
+  deleteOrderStatus,
 } from "./statusCatalog.controller";
 
 export const statusRouter = Router();
@@ -12,16 +12,16 @@ export const statusRouter = Router();
 // Status routes definition
 
 // Get all statuses
-statusRouter.get('/status', getStatuses);
+statusRouter.get('/status', getOrderStatuses);
 
 // Get status by ID
-statusRouter.get('/status/:id', getStatusById);
+statusRouter.get('/status/:id', getOrderStatusById);
 
 // Create a new status
-statusRouter.post('/status', createStatus);
+statusRouter.post('/status', createOrderStatus);
 
 // Update an existing status
-statusRouter.put('/status/:id', updateStatus);
+statusRouter.put('/status/:id', updateOrderStatus);
 
 // Delete an existing status
-statusRouter.delete('/status/:id', deleteStatus);
+statusRouter.delete('/status/:id', deleteOrderStatus);
