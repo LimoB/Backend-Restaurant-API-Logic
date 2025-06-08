@@ -9,6 +9,7 @@ import { RateLimiterMiddleware } from "./middleware/rateLimiter";
 import  statusRouter  from "./status/statusCatalog.route";
 import  orderRouter from "./orders/orders.route";
 import { driverRouter } from "./driver/driver.route";
+import { addressRouter } from "./address/address.route";
  
 dotenv.config()
  
@@ -36,6 +37,7 @@ app.use("/", orderRouter);
 app.use('/api', authRouter);
 app.use('/api', statusRouter);
 app.use('/api',driverRouter);
+app.use('/api',addressRouter);
 
 
 //Start server
