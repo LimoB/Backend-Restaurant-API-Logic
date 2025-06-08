@@ -4,7 +4,9 @@ import { users, type TUserInsert, type TUserSelect } from "../drizzle/schema";
 
 // Get all users
 export const getUsersServices = async (): Promise<TUserSelect[] | null> => {
-  return await db.query.users.findMany();
+  return await db.query.users.findMany({
+    
+  });
 };
 
 // Get user by ID
