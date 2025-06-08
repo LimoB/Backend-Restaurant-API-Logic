@@ -39,7 +39,7 @@ app.get("/", (req, res: Response) => {
 app.use("/api", userRouter);
 app.use("/api", stateRouter);
 app.use("/api", cityRouter);
-app.use("/", orderRouter);
+app.use("/api", orderRouter);
 app.use("/api", authRouter);
 app.use("/api", statusRouter);
 
