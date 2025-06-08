@@ -28,27 +28,6 @@ app.get('/',(req,res:Response)=>{
 })
  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //import routes
 app.use('/api', userRouter)
 // app.use('/api', stateRouter)
