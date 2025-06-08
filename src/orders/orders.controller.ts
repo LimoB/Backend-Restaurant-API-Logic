@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import {
   createOrderServices,
   deleteOrderServices,
@@ -7,59 +7,105 @@ import {
   updateOrderServices,
 } from "./orders.service";
 
-export const getOrders = async (req: Request, res: Response) => {
+// Get all orders
+export const getOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const orders = await getOrdersServices();
-    res.status(200).json(orders);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    const allOrders = await getOrdersServices();
+    if (!allOrders || allOrders.length === 0) {
+      res.status(404).json({ message: "No orders found" });
+      return;
+    }
+    res.status(200).json(allOrders);
+  } catch (error) {
+    next(error);
   }
 };
 
-export const getOrderById = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  if (isNaN(id)) return res.status(400).json({ error: "Invalid order ID" });
+// Get order by ID
+export const getOrderById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const orderId = parseInt(req.params.id);
+  if (isNaN(orderId)) {
+    res.status(400).json({ error: "Invalid order ID" });
+    return;
+  }
 
   try {
-    const order = await getOrderByIdServices(id);
-    if (!order) return res.status(404).json({ message: "Order not found" });
+    const order = await getOrderByIdServices(orderId);
+    if (!order) {
+      res.status(404).json({ message: "Order not found" });
+      return;
+    }
     res.status(200).json(order);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const createOrder = async (req: Request, res: Response) => {
+// Create new order
+export const createOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const newOrder = await createOrderServices(req.body);
-    res.status(201).json(newOrder);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(201).json({ message: newOrder });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const updateOrder = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  if (isNaN(id)) return res.status(400).json({ error: "Invalid order ID" });
+// Update order
+export const updateOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const orderId = parseInt(req.params.id);
+  if (isNaN(orderId)) {
+    res.status(400).json({ error: "Invalid order ID" });
+    return;
+  }
 
   try {
-    const updated = await updateOrderServices(id, req.body);
-    if (!updated) return res.status(404).json({ message: "Order not found" });
-    res.status(200).json(updated);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    const updatedOrder = await updateOrderServices(orderId, req.body);
+    res.status(200).json({ message: updatedOrder });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const deleteOrder = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  if (isNaN(id)) return res.status(400).json({ error: "Invalid order ID" });
+// Delete order
+export const deleteOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const orderId = parseInt(req.params.id);
+  if (isNaN(orderId)) {
+    res.status(400).json({ error: "Invalid order ID" });
+    return;
+  }
 
   try {
-    const deleted = await deleteOrderServices(id);
-    if (!deleted) return res.status(404).json({ message: "Order not found" });
-    res.status(200).json(deleted);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    const existingOrder = await getOrderByIdServices(orderId);
+    if (!existingOrder) {
+      res.status(404).json({ message: "Order not found" });
+      return;
+    }
+
+    const deletedOrder = await deleteOrderServices(orderId);
+    res.status(200).json({ message: deletedOrder });
+  } catch (error) {
+    next(error);
   }
 };
+

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import {
   createUserServices,
   deleteUserServices,
@@ -7,25 +7,36 @@ import {
   updateUserServices,
 } from "./user.service";
 
-export const getUsers = async (req: Request, res: Response) => {
+// Get all users
+export const getUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const allUsers = await getUsersServices();
-    if (!allUsers || allUsers.length === 0) {
+    const users = await getUsersServices();
+    if (!users || users.length === 0) {
       res.status(404).json({ message: "No users found" });
       return;
     }
-    res.status(200).json(allUsers);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || "Failed to fetch users" });
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
   }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+// Get user by ID
+export const getUserById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const userId = parseInt(req.params.id);
   if (isNaN(userId)) {
     res.status(400).json({ error: "Invalid user ID" });
     return;
   }
+
   try {
     const user = await getUserByIdServices(userId);
     if (!user) {
@@ -33,99 +44,75 @@ export const getUserById = async (req: Request, res: Response) => {
       return;
     }
     res.status(200).json(user);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || "Failed to fetch user" });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const createUserHandler = async (req: Request, res: Response) => {
-  const {
-    name,
-    contact_phone,
-    phone_verified = false,
-    email,
-    email_verified = false,
-    verification_code = "",
-    password,
-    address_id,
-  } = req.body;
+// Create new user
+export const createUserHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const userData = req.body;
 
-  if (!name || !contact_phone || !email || !password) {
-    res.status(400).json({ error: "Required fields: name, contact_phone, email, password" });
+  // Add here any required fields validation if needed
+  if (!userData.email || !userData.password) {
+    res.status(400).json({ error: "Email and password are required" });
     return;
   }
 
   try {
-    const newUser = await createUserServices({
-      name,
-      contact_phone,
-      phone_verified,
-      email,
-      email_verified,
-      verification_code,
-      password,
-      address_id,
-    });
-    res.status(201).json({ message: newUser });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || "Failed to create user" });
+    const message = await createUserServices(userData);
+    res.status(201).json({ message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+// Update existing user
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const userId = parseInt(req.params.id);
   if (isNaN(userId)) {
     res.status(400).json({ error: "Invalid user ID" });
     return;
   }
 
-  const {
-    name,
-    contact_phone,
-    phone_verified,
-    email,
-    email_verified,
-    verification_code,
-    password,
-    address_id,
-  } = req.body;
-
-  if (!name || !contact_phone || !email || !password) {
-    res.status(400).json({ error: "Required fields: name, contact_phone, email, password" });
-    return;
-  }
+  const userUpdates = req.body;
 
   try {
-    const updatedUser = await updateUserServices(userId, {
-      name,
-      contact_phone,
-      phone_verified,
-      email,
-      email_verified,
-      verification_code,
-      password,
-      address_id,
-    });
-    res.status(200).json({ message: updatedUser });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || "Failed to update user" });
+    const message = await updateUserServices(userId, userUpdates);
+    res.status(200).json({ message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+// Delete user
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const userId = parseInt(req.params.id);
   if (isNaN(userId)) {
     res.status(400).json({ error: "Invalid user ID" });
     return;
   }
+
   try {
     const deleted = await deleteUserServices(userId);
     if (deleted) {
       res.status(200).json({ message: "User deleted successfully" });
     } else {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found or could not be deleted" });
     }
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || "Failed to delete user" });
+  } catch (error) {
+    next(error);
   }
 };
