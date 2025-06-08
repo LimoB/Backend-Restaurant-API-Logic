@@ -8,10 +8,10 @@ import {
   updateDriver,
   deleteDriver,
 } from "./driver.controller";
+import validate from "../middleware/validate"; // Ensure you have this
+import { driverSchema } from "../validation/user.validator"; // Adjust path if needed
 
 export const driverRouter = Router();
-
-// Driver routes definition
 
 // Get all drivers
 driverRouter.get("/drivers", getDrivers);
@@ -22,11 +22,11 @@ driverRouter.get("/driver/:id", getDriverById);
 // Get drivers by User ID
 driverRouter.get("/driver/user/:userId", getDriversByUserId);
 
-// Create a new driver
-driverRouter.post("/driver", createDriverHandler);
+// Create a new driver (validated)
+driverRouter.post("/driver", validate(driverSchema), createDriverHandler);
 
-// Update an existing driver
-driverRouter.put("/driver/:id", updateDriver);
+// Update an existing driver (partial validation)
+driverRouter.put("/driver/:id", validate(driverSchema.partial()), updateDriver);
 
 // Delete an existing driver
 driverRouter.delete("/driver/:id", deleteDriver);

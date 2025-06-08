@@ -4,24 +4,28 @@ import {
   loginUser,
   requestPasswordReset,
   resetPassword,
-  verifyEmail, // ✅ Import verify controller
+  verifyEmail,
 } from "./auth.controller";
+
+import validate from "../middleware/validate";
+import {
+  unverifiedUserSchema,
+  loginSchema,
+} from "../validation/user.validator";
 
 export const authRouter = Router();
 
-// 🔐 Register a new user
-authRouter.post("/auth/register", createUser);
+// 🔐 Register a new user (with validation)
+authRouter.post("/auth/register",  createUser);//validate(unverifiedUserSchema),
 
-// 🔑 Login user
-authRouter.post("/auth/login", loginUser);
+// 🔑 Login user (with validation)
+authRouter.post("/auth/login", validate(loginSchema), loginUser);
 
-// 🔄 Request password reset
+// 🔄 Request password reset (add schema if desired)
 authRouter.post("/auth/request-reset", requestPasswordReset);
 
-// 🔁 Reset password using token
+// 🔁 Reset password using token (add schema if desired)
 authRouter.post("/auth/reset-password", resetPassword);
 
 // 📧 Verify email with code
-// authRouter.get("/auth/verify-email", verifyEmail); 
-authRouter.post('/auth/verify-email', verifyEmail);
-
+authRouter.post("/auth/verify-email", verifyEmail);

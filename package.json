@@ -1,6 +1,6 @@
 {
   "name": "myRestaurant",
-   "version": "1.0.0",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "gen": "drizzle-kit generate",
     "migrate": " tsx src/drizzle/migrate.ts",
     "studio": "drizzle-kit studio",
-    "push": " drizzle-kit generate && tsx src/drizzle/migrate.ts",
+    "push": "drizzle-kit generate && drizzle-kit push",
+
     "seed": "tsx src/drizzle/seed.ts"
   },
   "keywords": [],
@@ -18,6 +19,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.10.0",
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
     "bcrypt": "^6.0.0",
@@ -27,7 +29,8 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.3",
     "pg": "^8.16.0",
-    "rate-limiter-flexible": "^7.1.1"
+    "rate-limiter-flexible": "^7.1.1",
+    "zod": "^3.25.56"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

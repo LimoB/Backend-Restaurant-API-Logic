@@ -1,3 +1,4 @@
+// src/restaurant-owner/restaurantOwner.routes.ts
 import { Router } from "express";
 import {
   getRestaurantOwners,
@@ -7,6 +8,9 @@ import {
   updateRestaurantOwner,
   deleteRestaurantOwner,
 } from "./restaurantOwner.controller";
+
+import validate from "../middleware/validate";
+import { ownerSchema } from "../validation/user.validator"; // adjust if path differs
 
 export const restaurantOwnerRouter = Router();
 
@@ -22,11 +26,19 @@ restaurantOwnerRouter.get(
   getRestaurantOwnersByOwnerId
 );
 
-// Create a new restaurant owner
-restaurantOwnerRouter.post("/restaurant-owner", createRestaurantOwnerHandler);
+// Create a new restaurant owner (validated)
+restaurantOwnerRouter.post(
+  "/restaurant-owner",
+  validate(ownerSchema),
+  createRestaurantOwnerHandler
+);
 
-// Update a restaurant owner
-restaurantOwnerRouter.put("/restaurant-owner/:id", updateRestaurantOwner);
+// Update a restaurant owner (partial validation)
+restaurantOwnerRouter.put(
+  "/restaurant-owner/:id",
+  validate(ownerSchema.partial()),
+  updateRestaurantOwner
+);
 
 // Delete a restaurant owner
 restaurantOwnerRouter.delete("/restaurant-owner/:id", deleteRestaurantOwner);
