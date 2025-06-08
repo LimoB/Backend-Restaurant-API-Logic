@@ -9,8 +9,6 @@ import { authRouter } from "./auth/auth.route";
 import { stateRouter } from "./state/state.route";
 import { cityRouter } from "./city/city.route";
 
-import { authRouter } from "./auth/auth.route";
-import { RateLimiterMiddleware } from "./middleware/rateLimiter";
 import { statusRouter } from "./status/statusCatalog.route";
 import orderRouter from "./orders/orders.route";
 import { driverRouter } from "./driver/driver.route";
