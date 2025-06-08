@@ -2,8 +2,8 @@ import express, { Application, Response } from "express";
 import dotenv from "dotenv"
 import { logger } from "./middleware/logger";
 import { userRouter } from "./users/user.route";
-// import { stateRouter } from "./state/state.route";
-// import { cityRouter } from "./city/city.route";
+import { stateRouter } from "./state/state.route";
+import { cityRouter } from "./city/city.route";
 import { authRouter } from "./auth/auth.route";
 import { RateLimiterMiddleware } from "./middleware/rateLimiter";
 import  statusRouter  from "./status/statusCatalog.route";
@@ -29,8 +29,8 @@ app.get('/',(req,res:Response)=>{
  
 //import routes
 app.use('/api', userRouter)
-// app.use('/api', stateRouter)
-// app.use('/api', cityRouter)
+app.use('/api', stateRouter)
+app.use('/api', cityRouter)
 app.use("/", orderRouter);
 app.use('/api', authRouter)
 app.use('/api', statusRouter);
