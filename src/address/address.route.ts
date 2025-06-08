@@ -1,20 +1,27 @@
 import { Router } from "express";
-import { createAddressHandler, deleteAddress, getAddresses, getAddresssUsingId, updateAddressses } from "./address.controller";
+import {
+  getAddresses,
+  getAddressById,
+  createAddressHandler,
+  updateAddress,
+  deleteAddress,
+} from "./address.controller";
 
 export const addressRouter = Router();
 
-// getAllAddresses
-addressRouter.get('/address',getAddresses);
+// Address routes definition
 
-// getAddressById
-addressRouter.get('/address/:id',getAddresssUsingId);
+// Get all addresses
+addressRouter.get("/address", getAddresses);
 
-// create Address
-addressRouter.post('/address',createAddressHandler);
+// Get address by ID
+addressRouter.get("/address/:id", getAddressById);
 
-// Update Adress
-addressRouter.put('/address/:id',updateAddressses);
+// Create a new address
+addressRouter.post("/address", createAddressHandler);
 
-// Delete Address
-addressRouter.delete('/address/:id',deleteAddress);
+// Update an existing address
+addressRouter.put("/address/:id", updateAddress);
 
+// Delete an existing address
+addressRouter.delete("/address/:id", deleteAddress);
