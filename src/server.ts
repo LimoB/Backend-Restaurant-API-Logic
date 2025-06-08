@@ -8,6 +8,7 @@ import { authRouter } from "./auth/auth.route";
 import { RateLimiterMiddleware } from "./middleware/rateLimiter";
 import  {statusRouter}  from "./status/statusCatalog.route";
 import  orderRouter from "./orders/orders.route";
+import { restaurantOwnerRouter } from "./restaurantOwner/restaurantOwner.route";
  
 dotenv.config()
  
@@ -35,6 +36,8 @@ app.use('/api', userRouter)
 app.use("/", orderRouter);
 app.use('/api', authRouter)
 app.use('/api', statusRouter);
+app.use('/api', restaurantOwnerRouter);
+
 
 
 
