@@ -9,7 +9,10 @@ import { RateLimiterMiddleware } from "./middleware/rateLimiter";
 import  {statusRouter}  from "./status/statusCatalog.route";
 import  orderRouter from "./orders/orders.route";
 import { commentRouter } from "./comment/comment.route";
- 
+import { driverRouter } from "./driver/driver.route";
+
+
+
 dotenv.config()
  
 const app:Application = express()
@@ -29,18 +32,26 @@ app.get('/',(req,res:Response)=>{
 })
  
 
+
+
+
 //import routes
 app.use('/api', userRouter)
+
+
+
 // app.use('/api', stateRouter)
 // app.use('/api', cityRouter)
-app.use("/api", orderRouter);
+app.use("/", orderRouter);
 app.use('/api', authRouter)
 app.use('/api', statusRouter);
+
 app.use('/api', commentRouter)
 
 
 
 
+app.use('/api',driverRouter);
 
 
 //Start server
