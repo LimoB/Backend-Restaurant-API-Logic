@@ -1,0 +1,2 @@
+ALTER TABLE "orders" ALTER COLUMN "status" SET DEFAULT 'pending'::"public"."status_enum";--> statement-breakpoint
+ALTER TABLE "orders" ALTER COLUMN "status" SET DATA TYPE "public"."status_enum" USING "status"::"public"."status_enum";

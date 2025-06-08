@@ -17,7 +17,10 @@ restaurantOwnerRouter.get("/restaurant-owner", getRestaurantOwners);
 restaurantOwnerRouter.get("/restaurant-owner/:id", getRestaurantOwnerById);
 
 // Get restaurant owners by owner ID
-restaurantOwnerRouter.get("/restaurant-owner/owner/:ownerId", getRestaurantOwnersByOwnerId);
+restaurantOwnerRouter.get(
+  "/restaurant-owner/owner/:ownerId",
+  getRestaurantOwnersByOwnerId
+);
 
 // Create a new restaurant owner
 restaurantOwnerRouter.post("/restaurant-owner", createRestaurantOwnerHandler);
