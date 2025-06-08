@@ -123,6 +123,7 @@ export const loginUser = async (
     const payload = {
       userId: user.id,
       email: user.email,
+      user_type: user.user_type, // ✅ Include user_type in token
     };
 
     const secret = process.env.JWT_SECRET;
@@ -143,6 +144,7 @@ export const loginUser = async (
     res.status(500).json({ error: err.message || "Failed to log in user." });
   }
 };
+
 
 // ────────────────────────────────
 // 🔹 Request Password Reset
