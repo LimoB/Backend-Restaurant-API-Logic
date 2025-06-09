@@ -88,7 +88,7 @@ CREATE TABLE "orders" (
 	"discount" numeric(10, 2) DEFAULT '0' NOT NULL,
 	"final_price" numeric(10, 2) NOT NULL,
 	"comment" text DEFAULT '',
-	"status" varchar(50) DEFAULT 'pending' NOT NULL,
+	"status" "status_enum" DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );

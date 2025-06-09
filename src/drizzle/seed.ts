@@ -19,9 +19,7 @@ import {
 export async function seed() {
   // Insert states
   const [california] = await db
-    .insert(state)
-    .values([{ name: "California", code: "CA" }])
-    .returning();
+    .insert(state).values([{ name: "California", code: "CA" }]).returning();
 
   const [texas] = await db
     .insert(state)
