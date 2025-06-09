@@ -16,6 +16,8 @@ import { restaurantRouter } from "./restaurant/restaurant.route";
 import { orderMenuItemRouter } from "./order_menu_item/order_menu_item.route";
 import { menuItemRouter } from "./menu_item/menu_item.route";
 import { categoryRouter } from "./category/category.route";
+// import { comment } from "./drizzle/schema";
+import { commentRouter } from "./comment/comment.route";
 
 dotenv.config();
 
@@ -49,6 +51,7 @@ app.use("/api", restaurantRouter);
 app.use("/api", orderMenuItemRouter);
 app.use("/api", menuItemRouter);
 app.use("/api", categoryRouter);
+app.use("/api", commentRouter);
 
 //Start server
 
