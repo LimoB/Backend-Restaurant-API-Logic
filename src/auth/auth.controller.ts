@@ -35,6 +35,8 @@ export const createUser = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  console.log("🚨 createUser called");
+
   try {
     const user: UserInput = req.body;
 
@@ -76,12 +78,34 @@ export const createUser = async (
       updated_at: new Date(),
     });
 
-    await sendNotificationEmail(
-      user.email,
-      user.name,
-      "Email Verification Required",
-      `Welcome! Your verification code is: <span style="color:blue; font-weight:bold;">${verificationCode}</span>. It will expire in 10 minutes.`
-    );
+    // ✅ Determine if the request came from an admin
+    const isAdminRequest = req.user?.user_type === "admin";
+    console.log("👤 isAdminRequest:", isAdminRequest);
+
+    const subject = isAdminRequest
+      ? "Your Account Has Been Created by Admin"
+      : "Email Verification Required";
+
+    const htmlMessage = isAdminRequest
+      ? `
+        <p>An admin has created an account for you. Please verify your email to activate your account.</p>
+        <p><strong>🔐 Verification Code: ${verificationCode}</strong></p>
+        <p><a href="https://yourapp.com/verify?code=${verificationCode}">Verify Account</a></p>
+        <hr/>
+        <p>Login Credentials:</p>
+        <ul>
+          <li>Email: <strong>${user.email}</strong></li>
+          <li>Password: <strong>${user.password}</strong></li>
+        </ul>
+        <p><em>Note: This code expires in 10 minutes.</em></p>
+      `
+      : `
+        <p>Welcome! Your verification code is:</p>
+        <p><strong style="color:blue;">${verificationCode}</strong></p>
+        <p>It will expire in 10 minutes.</p>
+      `;
+
+    await sendNotificationEmail(user.email, user.name, subject, htmlMessage);
 
     res.status(201).json({
       message: "A verification email has been sent. Please check your inbox.",
@@ -91,6 +115,8 @@ export const createUser = async (
     res.status(500).json({ error: err.message || "Failed to register user." });
   }
 };
+
+
 
 // ────────────────────────────────
 // 🔹 Login User
@@ -269,6 +295,9 @@ export const verifyEmail = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+
+  console.log("✅ adminCreateUser called");
+
   try {
     const { verificationCode } = req.body;
 
@@ -299,3 +328,74 @@ export const verifyEmail = async (
   }
 };
 
+
+
+export const adminCreateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+
+  try {
+    const { email, full_name, password, user_type, contact_phone } = req.body;
+
+    if (!email || !full_name || !password || !user_type || !contact_phone) {
+      res.status(400).json({ error: "All fields are required." });
+      return;
+    }
+
+    const existingUnverified = await getUnverifiedUserByEmail(email);
+    if (existingUnverified) {
+      await deleteUnverifiedUserById(existingUnverified.id);
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
+    const allowedUserTypes = ["member", "admin", "driver", "owner"] as const;
+    type AllowedUserType = typeof allowedUserTypes[number];
+
+    const normalizedType = user_type.toLowerCase();
+    const validUserType: AllowedUserType = allowedUserTypes.includes(normalizedType as AllowedUserType)
+      ? (normalizedType as AllowedUserType)
+      : "member";
+
+    await createUnverifiedUserService({
+      name: full_name,
+      email,
+      password: hashedPassword,
+      contact_phone,
+      user_type: validUserType,
+      verification_code: verificationCode,
+      verification_code_expiry: expiry,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    const subject = "Your Account Has Been Created";
+    const htmlMessage = `
+      <p>An admin has created an account for you. Please verify your email to activate your account.</p>
+      <p><strong>🔐 Verification Code: ${verificationCode}</strong></p>
+      <p>Or click the link below to verify your account:</p>
+      <p><a class="btn" href="https://yourapp.com/verify?code=${verificationCode}">Verify Account</a></p>
+      <hr/>
+      <p>You can log in after verifying using:</p>
+      <ul>
+        <li>Email: <strong>${email}</strong></li>
+        <li>Password: <strong>${password}</strong></li>
+      </ul>
+      <p><em>Note: This code expires in 15 minutes.</em></p>
+    `;
+
+    // 🧠 Make sure THIS email is being sent — not some fallback one
+    await sendNotificationEmail(email, full_name, subject, htmlMessage);
+
+    res.status(201).json({
+      message: "User created and verification email sent.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};

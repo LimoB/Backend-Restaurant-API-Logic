@@ -1,41 +1,50 @@
 import { Router } from "express";
 import {
-  unverifiedUserSchema,
-  loginSchema,
-  driverSchema,
-  ownerSchema,
-} from "../validation/user.validator";
-import {
   createUserHandler,
   deleteUser,
   getUserById,
   getUsers,
   updateUser,
+ // ✅ Imported your updated controller for admin-based creation with email verification
 } from "./user.controller";
+
+import { adminCreateUser } from "../auth/invite.controller"; // adjust path if needed
+
 
 import {
   adminRoleAuth,
-  bothRolesAuth,
-  userRoleAuth,
+  adminOrMemberAuth, // ✅ This allows both admin and member
 } from "../middleware/bearAuth";
 
-import validate from "../middleware/validate";  // <-- import your Zod validation middleware
+import validate from "../middleware/validate";
+
+import {
+  createUserSchema,
+  updateUserSchema,
+} from "../validation/user.validator";
 
 export const userRouter = Router();
 
-// Admin only can get all users
+// ✅ Get all users (Admin only)
 userRouter.get("/users", adminRoleAuth, getUsers);
 
-// Get user by ID - no auth or optionally add bothRolesAuth
-userRouter.get("/users/:id", getUserById); // uncomment bothRolesAuth if needed
+// ✅ Get user by ID (no auth, public or will restrict later via custom logic)
+userRouter.get("/users/:id", getUserById);
 
-// Create user - open or protected by bothRolesAuth
-// Here, validate input with unverifiedUserSchema (adjust if you want other schemas)
-userRouter.post("/users", validate(unverifiedUserSchema), createUserHandler);
+// ✅ Self-service public user registration (no auth, only validation)
+userRouter.post("/users", validate(createUserSchema), createUserHandler);
 
-// Update user - bothRolesAuth required
-// Validate update body with the base schema or custom schema if you want partial validation
-userRouter.put("/users/:id", bothRolesAuth, validate(unverifiedUserSchema), updateUser);
+// ✅ Admin OR authenticated member creating user (uses your createUser function)
+userRouter.post(
+  "/users/create",
+  adminOrMemberAuth,
+  validate(createUserSchema),
+  adminCreateUser
+);
 
-// Delete user - admin only
+
+// ✅ Update user (Admin or same user, assume your controller checks ownership)
+userRouter.put("/users/:id", adminOrMemberAuth, validate(updateUserSchema), updateUser);
+
+// ✅ Delete user (Admin only)
 userRouter.delete("/users/:id", adminRoleAuth, deleteUser);

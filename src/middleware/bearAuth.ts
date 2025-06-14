@@ -14,8 +14,12 @@ type UserType = "admin" | "member" | "driver" | "owner" | string;
 type DecodedToken = {
   userId: string;
   email: string;
-  user_type: UserType; // 👈 snake_case to match JWT payload
+  user_type: UserType;
   exp?: number;
+};
+
+export const generateVerificationCode = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
 };
 
 export const verifyToken = (
@@ -30,9 +34,11 @@ export const verifyToken = (
   }
 };
 
-const authMiddlewareFactory = (requiredRole: UserType | "both") => {
+// ✅ Improved factory: accepts one role or multiple
+const authMiddlewareFactory = (allowedRoles: UserType | UserType[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.header("Authorization");
+
     if (!authHeader) {
       res.status(401).json({ error: "Authorization header is missing" });
       return;
@@ -43,6 +49,7 @@ const authMiddlewareFactory = (requiredRole: UserType | "both") => {
       : authHeader;
 
     const decodedToken = verifyToken(token, process.env.JWT_SECRET as string);
+
     if (!decodedToken) {
       res.status(401).json({ error: "Invalid or expired token" });
       return;
@@ -50,10 +57,8 @@ const authMiddlewareFactory = (requiredRole: UserType | "both") => {
 
     const { user_type } = decodedToken;
 
-    const hasAccess =
-      requiredRole === "both"
-        ? ["admin", "member"].includes(user_type)
-        : user_type === requiredRole;
+    const allowedArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+    const hasAccess = allowedArray.includes(user_type);
 
     if (!hasAccess) {
       res.status(403).json({
@@ -67,8 +72,10 @@ const authMiddlewareFactory = (requiredRole: UserType | "both") => {
   };
 };
 
+// ✅ Usage
 export const adminRoleAuth = authMiddlewareFactory("admin");
 export const userRoleAuth = authMiddlewareFactory("member");
 export const driverRoleAuth = authMiddlewareFactory("driver");
 export const ownerRoleAuth = authMiddlewareFactory("owner");
-export const bothRolesAuth = authMiddlewareFactory("both");
+export const adminOrMemberAuth = authMiddlewareFactory(["admin", "member"]);
+export const allRolesAuth = authMiddlewareFactory(["admin", "member", "driver", "owner"]);
