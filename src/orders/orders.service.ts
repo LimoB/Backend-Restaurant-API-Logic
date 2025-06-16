@@ -11,6 +11,10 @@ export const getOrdersServices = async () => {
   return await db.query.orders.findMany({
     with: {
       user: {
+        columns: {
+          id: true,
+          name: true,
+        },
         with: {
           address: {
             with: {
@@ -29,15 +33,29 @@ export const getOrdersServices = async () => {
         },
       },
       restaurant: {
+        columns: {
+          id: true,
+          name: true,
+        },
         with: {
           city: true,
         },
       },
       address: {
+        columns: {
+          id: true,
+        },
         with: {
           city: {
+            columns: {
+              name: true,
+            },
             with: {
-              state: true,
+              state: {
+                columns: {
+                  name: true,
+                },
+              },
             },
           },
         },
@@ -65,6 +83,7 @@ export const getOrdersServices = async () => {
     },
   });
 };
+
 
 // Get a single order by ID with relations
 export const getOrderByIdServices = async (orderId: number) => {

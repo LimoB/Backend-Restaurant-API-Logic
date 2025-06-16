@@ -36,6 +36,8 @@ export const createUser = async (
   next: NextFunction
 ): Promise<void> => {
   console.log("🚨 createUser called");
+  console.log("🔥 createUser reached", req.body); // Debug
+
 
   try {
     const user: UserInput = req.body;
@@ -290,23 +292,65 @@ export const resetPassword = async (
 //     const err = error as Error;
 //     res.status(500).json({ error: err.message || "Failed to verify email." });
 //   }
+
+
+
+
+
+// // };
+// export const verifyEmail = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+
+//   console.log("✅ adminCreateUser called");
+
+//   try {
+//     const { verificationCode } = req.body;
+
+//     if (!verificationCode || typeof verificationCode !== "string") {
+//       res.status(400).json({ error: "Invalid verification code." });
+//       return;
+//     }
+
+//     const unverifiedUser = await getUnverifiedUserByCode(verificationCode);
+//     if (
+//       !unverifiedUser ||
+//       !unverifiedUser.verification_code_expiry ||
+//       new Date() > new Date(unverifiedUser.verification_code_expiry)
+//     ) {
+//       res.status(400).json({ error: "Invalid or expired verification code." });
+//       return;
+//     }
+
+//     const createdUser = await moveUnverifiedToVerified(unverifiedUser);
+
+//     res.status(200).json({
+//       message: "Email verified successfully. Account created.",
+//       user: createdUser,
+//     });
+//   } catch (error) {
+//     const err = error as Error;
+//     res.status(500).json({ error: err.message || "Failed to verify email." });
+//   }
 // };
+
+
+
 export const verifyEmail = async (
   req: Request,
   res: Response
 ): Promise<void> => {
+  const code =
+    req.body.verificationCode || req.query.code;
 
-  console.log("✅ adminCreateUser called");
+  if (!code || typeof code !== "string") {
+    res.status(400).json({ error: "Invalid verification code." });
+    return;
+  }
 
   try {
-    const { verificationCode } = req.body;
-
-    if (!verificationCode || typeof verificationCode !== "string") {
-      res.status(400).json({ error: "Invalid verification code." });
-      return;
-    }
-
-    const unverifiedUser = await getUnverifiedUserByCode(verificationCode);
+    const unverifiedUser = await getUnverifiedUserByCode(code);
     if (
       !unverifiedUser ||
       !unverifiedUser.verification_code_expiry ||
@@ -327,6 +371,7 @@ export const verifyEmail = async (
     res.status(500).json({ error: err.message || "Failed to verify email." });
   }
 };
+
 
 
 

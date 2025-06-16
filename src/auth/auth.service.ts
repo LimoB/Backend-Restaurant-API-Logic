@@ -114,19 +114,19 @@ export const deleteUnverifiedUserById = async (id: number): Promise<void> => {
 // ────────────────────────────────
 // Helper: Move unverified user to verified users
 // ────────────────────────────────
-
 export const moveUnverifiedToVerified = async (
   unverifiedUser: UnverifiedUserSelect
 ): Promise<UserSelect> => {
-  // Validate user_type, fallback to undefined if invalid
-  const userType = isUserType(unverifiedUser.user_type) ? unverifiedUser.user_type : undefined;
+  if (!isUserType(unverifiedUser.user_type)) {
+    throw new Error("Invalid user_type for unverified user");
+  }
 
   const newUserData: UserInsert = {
     name: unverifiedUser.name,
     email: unverifiedUser.email,
     password: unverifiedUser.password,
     contact_phone: unverifiedUser.contact_phone,
-    user_type: userType,
+    user_type: unverifiedUser.user_type,
     email_verified: true,
     phone_verified: false,
     verification_code: null,
@@ -136,11 +136,9 @@ export const moveUnverifiedToVerified = async (
     updated_at: new Date(),
   };
 
-  // Create verified user record
-  const newUser = await createUserServices(newUserData);
-
-  // Remove unverified user record
-  await deleteUnverifiedUserById(unverifiedUser.id);
-
-  return newUser;
+  return await db.transaction(async (tx) => {
+    const [newUser] = await tx.insert(users).values(newUserData).returning();
+    await tx.delete(unverified_users).where(eq(unverified_users.id, unverifiedUser.id));
+    return newUser;
+  });
 };
