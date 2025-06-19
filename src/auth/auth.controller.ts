@@ -30,49 +30,49 @@ type AllowedUserType = typeof allowedUserTypes[number];
 // ────────────────────────────────
 // 🔹 Register User
 // ────────────────────────────────
+
 export const createUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  console.log("🚨 createUser called");
-  console.log("🔥 createUser reached", req.body); // Debug
-
+  console.log("🚨 createUser called", req.body);
 
   try {
-    const user: UserInput = req.body;
+    const user = req.body;
 
     if (!user.name || !user.email || !user.password) {
       res.status(400).json({ error: "Name, email, and password are required." });
       return;
     }
 
+    // Check for existing verified user
     const existingUser = await getUserByEmailIdServices(user.email);
     if (existingUser) {
       res.status(400).json({ error: "A user with this email already exists." });
       return;
     }
 
+    // Remove any existing unverified account
     const existingUnverified = await getUnverifiedUserByEmail(user.email);
     if (existingUnverified) {
       await deleteUnverifiedUserById(existingUnverified.id);
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(user.password, salt);
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    const rawUserType = user.user_type?.toLowerCase();
-    const userType: AllowedUserType = allowedUserTypes.includes(rawUserType as AllowedUserType)
-      ? (rawUserType as AllowedUserType)
+    const rawType = user.user_type?.toLowerCase?.();
+    const userType: AllowedUserType = allowedUserTypes.includes(rawType as AllowedUserType)
+      ? (rawType as AllowedUserType)
       : "member";
 
     await createUnverifiedUserService({
       name: user.name,
       email: user.email,
       password: hashedPassword,
-      contact_phone: user.contact_phone ?? "0000000000",
+      contact_phone: user.contact_phone || "0000000000",
       verification_code: verificationCode,
       verification_code_expiry: expiry,
       user_type: userType,
@@ -80,10 +80,7 @@ export const createUser = async (
       updated_at: new Date(),
     });
 
-    // ✅ Determine if the request came from an admin
     const isAdminRequest = req.user?.user_type === "admin";
-    console.log("👤 isAdminRequest:", isAdminRequest);
-
     const subject = isAdminRequest
       ? "Your Account Has Been Created by Admin"
       : "Email Verification Required";
@@ -99,12 +96,13 @@ export const createUser = async (
           <li>Email: <strong>${user.email}</strong></li>
           <li>Password: <strong>${user.password}</strong></li>
         </ul>
-        <p><em>Note: This code expires in 10 minutes.</em></p>
+        <p><em>This code expires in 10 minutes.</em></p>
       `
       : `
-        <p>Welcome! Your verification code is:</p>
-        <p><strong style="color:blue;">${verificationCode}</strong></p>
-        <p>It will expire in 10 minutes.</p>
+        <p>Hello ${user.name},</p>
+        <p>Your verification code is:</p>
+        <h2 style="color:blue;">${verificationCode}</h2>
+        <p>Please enter this code to complete your registration. It expires in 10 minutes.</p>
       `;
 
     await sendNotificationEmail(user.email, user.name, subject, htmlMessage);
@@ -113,10 +111,11 @@ export const createUser = async (
       message: "A verification email has been sent. Please check your inbox.",
     });
   } catch (error) {
-    const err = error as Error;
-    res.status(500).json({ error: err.message || "Failed to register user." });
+    console.error("❌ Error in createUser:", error);
+    res.status(500).json({ error: (error as Error).message || "Failed to register user." });
   }
 };
+
 
 
 
@@ -337,40 +336,49 @@ export const resetPassword = async (
 
 
 
-export const verifyEmail = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const code =
-    req.body.verificationCode || req.query.code;
+
+
+export const verifyEmail = async (req: Request, res: Response): Promise<void> => {
+  const code = req.body.verificationCode || req.body.code || req.query.code;
 
   if (!code || typeof code !== "string") {
     res.status(400).json({ error: "Invalid verification code." });
     return;
   }
 
+  console.log("🔍 Verifying code:", code);
+
   try {
     const unverifiedUser = await getUnverifiedUserByCode(code);
-    if (
-      !unverifiedUser ||
-      !unverifiedUser.verification_code_expiry ||
-      new Date() > new Date(unverifiedUser.verification_code_expiry)
-    ) {
+    console.log("🔐 Fetched unverified user:", unverifiedUser);
+
+    if (!unverifiedUser) {
       res.status(400).json({ error: "Invalid or expired verification code." });
       return;
     }
 
-    const createdUser = await moveUnverifiedToVerified(unverifiedUser);
+    const expiry = new Date(unverifiedUser.verification_code_expiry);
+    console.log("⏰ Expiry:", expiry);
+
+    if (isNaN(expiry.getTime()) || new Date() > expiry) {
+      res.status(400).json({ error: "Verification code expired." });
+      return;
+    }
+
+    const { user, token } = await moveUnverifiedToVerified(unverifiedUser);
+    console.log("✅ Created and verified user:", user);
 
     res.status(200).json({
       message: "Email verified successfully. Account created.",
-      user: createdUser,
+      user,
+      token,
     });
   } catch (error) {
-    const err = error as Error;
-    res.status(500).json({ error: err.message || "Failed to verify email." });
+    console.error("❌ Error verifying email:", error);
+    res.status(500).json({ error: (error as Error).message || "Internal Server Error" });
   }
 };
+
 
 
 

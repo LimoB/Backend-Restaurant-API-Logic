@@ -1,6 +1,6 @@
 // app.ts
 import express, { Application, Request, Response } from "express";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import cors from "cors"; // ✅ Add this line
 import { logger } from "./middleware/logger";
 import { RateLimiterMiddleware } from "./middleware/rateLimiter";
@@ -21,7 +21,6 @@ import { commentRouter } from "./comment/comment.route";
 import inviteRoutes from "./auth/invite.route";
 
 
-dotenv.config();
 
 const app: Application = express();
 
