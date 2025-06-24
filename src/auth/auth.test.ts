@@ -1,7 +1,7 @@
 import request from "supertest";
-import app from "../src/app";
-import db from "../src/drizzle/db";
-import { users, unverified_users } from "../src/drizzle/schema";
+import app from "../app";
+import db from "../drizzle/db";
+import { users, unverified_users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 // Increase Jest timeout globally for this test suite

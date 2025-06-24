@@ -9,7 +9,7 @@ import {
   deleteDriver,
 } from "./driver.controller";
 import validate from "../middleware/validate"; // Ensure you have this
-import { driverSchema } from "../validation/user.validator"; // Adjust path if needed
+import { driverSchema } from "../users/user.validator"; // Adjust path if needed
 
 export const driverRouter = Router();
 

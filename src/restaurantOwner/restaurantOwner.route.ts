@@ -10,7 +10,7 @@ import {
 } from "./restaurantOwner.controller";
 
 import validate from "../middleware/validate";
-import { ownerSchema } from "../validation/user.validator"; // adjust if path differs
+import { ownerSchema } from "../users/user.validator"; // adjust if path differs
 
 export const restaurantOwnerRouter = Router();
 

@@ -174,3 +174,21 @@ export const moveUnverifiedToVerified = async (
 
   return { user: createdUser, token };
 };
+
+
+
+
+export const updateVerificationCodeForUser = async (
+  userId: number,
+  code: string,
+  expiry: Date
+): Promise<void> => {
+  await db
+    .update(unverified_users)
+    .set({
+      verification_code: code,
+      verification_code_expiry: expiry,
+      updated_at: new Date(),
+    })
+    .where(eq(unverified_users.id, userId));
+};

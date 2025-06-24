@@ -5,7 +5,7 @@ import {
   getUserById,
   getUsers,
   updateUser,
- // ✅ Imported your updated controller for admin-based creation with email verification
+  // ✅ Imported your updated controller for admin-based creation with email verification
 } from "./user.controller";
 
 import { adminCreateUser } from "../auth/invite.controller"; // adjust path if needed
@@ -21,7 +21,7 @@ import validate from "../middleware/validate";
 import {
   createUserSchema,
   updateUserSchema,
-} from "../validation/user.validator";
+} from "./user.validator";
 
 export const userRouter = Router();
 
