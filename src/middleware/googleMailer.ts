@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendNotificationEmail = async (
   email: string,
-  fullName: string,
+  fullName: string, // You can still pass this in, in case you want to use it manually in `message`
   subject: string,
   message: string
 ): Promise<string> => {
@@ -75,7 +75,6 @@ export const sendNotificationEmail = async (
         <body>
           <div class="email-container">
             <h2>${subject}</h2>
-            <p>Hello ${fullName},</p>
             ${message}
             <p style="margin-top: 20px;">Enjoy our services!</p>
             <div class="footer">

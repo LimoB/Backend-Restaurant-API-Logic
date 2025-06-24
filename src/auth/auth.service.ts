@@ -26,10 +26,12 @@ function isUserType(value: any): value is AllowedUserType {
 // USERS TABLE SERVICES
 // ────────────────────────────────
 
-export const createUserServices = async (user: UserInsert): Promise<UserSelect> => {
+export const createUserService = async (user: UserInsert): Promise<UserSelect> => {
   const [newUser] = await db.insert(users).values(user).returning();
   return newUser;
 };
+
+
 
 export const getUserByEmailIdServices = async (
   email: string
@@ -74,6 +76,9 @@ export const resetUserPasswordService = async (
     })
     .where(eq(users.id, userId));
 };
+
+
+
 
 // ────────────────────────────────
 // UNVERIFIED USERS TABLE SERVICES
@@ -159,6 +164,8 @@ export const moveUnverifiedToVerified = async (
     secret,
     { expiresIn: "1h" }
   );
+
+
 
   // 📧 Send Welcome Email
   const subject = "🎉 Welcome to Our Platform!";
