@@ -75,6 +75,7 @@ export const users = pgTable("users", {
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
   address_id: integer("address_id").references(() => address.id),
+  image_url: text("image_url").default(""), // 🔹 Added for profile/avatar image
 });
 
 // Unverified Users
@@ -89,6 +90,7 @@ export const unverified_users = pgTable("unverified_users", {
   user_type: userTypeEnum("user_type").default("member").notNull(),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
+  image_url: text("image_url").default(""), // 🔹 Optional: avatar for unverified user
 });
 
 // Restaurant
@@ -102,13 +104,17 @@ export const restaurant = pgTable("restaurant", {
   contact_email: varchar("contact_email", { length: 255 }).default(""),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
+  image_url: text("image_url").default(""), // 🔹 Added for restaurant logo/banner
 });
+
 
 // Category
 export const category = pgTable("category", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  image_url: text("image_url").default(""), // 🔹 Added column for image URL
 });
+
 
 // Menu Item
 export const menu_item = pgTable("menu_item", {
@@ -118,6 +124,7 @@ export const menu_item = pgTable("menu_item", {
   name: text("name").notNull(),
   ingredients: text("ingredients").default(""),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  image_url: text("image_url").default(""), // 🔹 Added column for image URL
   active: boolean("active").default(true).notNull(),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
@@ -155,7 +162,7 @@ export const orders = pgTable("orders", {
   discount: decimal("discount", { precision: 10, scale: 2 }).default("0").notNull(),
   final_price: decimal("final_price", { precision: 10, scale: 2 }).notNull(),
   comment: text("comment").default(""),
-   status: statusEnum("status").default("pending").notNull(),
+  status: statusEnum("status").default("pending").notNull(),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
 });

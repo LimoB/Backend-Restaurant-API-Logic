@@ -15,6 +15,13 @@
       "when": 1749386960762,
       "tag": "0001_adorable_kitty_pryde",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750698070298,
+      "tag": "0002_blushing_magneto",
+      "breakpoints": true
     }
   ]
 }
