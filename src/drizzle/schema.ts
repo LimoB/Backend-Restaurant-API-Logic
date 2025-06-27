@@ -279,7 +279,7 @@ export const userRelations = relations(users, ({ one, many }) => ({
     references: [address.id],
   }),
   drivers: many(driver),
-  comments: many(comment),
+  comments: many(comment), // ✅ renamed from `comment` to `comments` for consistency
   orders: many(orders),
   restaurantOwners: many(restaurant_owner),
 }));
@@ -347,7 +347,7 @@ export const orderRelations = relations(orders, ({ one, many }) => ({
     references: [address.id],
   }),
   orderMenuItems: many(order_menu_item),
-  comments: many(comment),
+  comments: many(comment), // ✅ fixed key name to `comments`
   statuses: many(order_status),
 }));
 

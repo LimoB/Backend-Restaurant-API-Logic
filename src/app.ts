@@ -11,7 +11,7 @@ import { authRouter } from "./auth/auth.route";
 import { stateRouter } from "./state/state.route";
 import { cityRouter } from "./city/city.route";
 import { statusRouter } from "./status/statusCatalog.route";
-import orderRouter from "./orders/orders.route";
+import { orderRouter } from "./orders/orders.route";
 import { driverRouter } from "./driver/driver.route";
 import { restaurantRouter } from "./restaurant/restaurant.route";
 import { orderMenuItemRouter } from "./order_menu_item/order_menu_item.route";

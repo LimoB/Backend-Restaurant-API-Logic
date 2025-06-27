@@ -6,13 +6,12 @@ import {
   updateComment,
   deleteComment,
 } from "./comment.controller";
-import router from "../orders/orders.route";
 
 export const commentRouter = Router();
 
-router.get("/comments", getComments);
-router.get("/comments/:id", getCommentById);
-router.post("/comments", createComment);
-router.put("/comments/:id", updateComment);
-router.delete("/comments/:id", deleteComment);
+commentRouter.get("/comments", getComments);
+commentRouter.get("/comments/:id", getCommentById);
+commentRouter.post("/comments", createComment);
+commentRouter.put("/comments/:id", updateComment);
+commentRouter.delete("/comments/:id", deleteComment);
 

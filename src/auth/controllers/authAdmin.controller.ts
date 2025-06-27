@@ -54,8 +54,8 @@ export const adminCreateUser = async (
         <li><strong>Email:</strong> ${newUser.email}</li>
         <li> <strong>Password:</strong> ${password}</li>
       </ul>
-      <p>You can login here: <a href="https://li-amazingrestaurant.com.com/login" style="color: #007bff;">https://li-amazingrestaurant.com.com/login</a></p>
-      <p>❓ If you have any questions, feel free to reach out to our support team.</p>
+      <p>You can login here: <a href="https://li-amazingrestaurant.com.com/login" style="color: #007bff;">https://li-amazingrestaurant.com/login</a></p>
+      <p>If you have any questions❓, feel free to reach out to our support team.</p>
       <p style="margin-top: 30px;">Warm regards,<br/>💼 The YourApp Team</p>
     `;
 

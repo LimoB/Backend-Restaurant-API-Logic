@@ -1,4 +1,3 @@
-// src/orders/orders.route.ts
 import { Router } from "express";
 import {
   getOrders,
@@ -7,19 +6,14 @@ import {
   updateOrder,
   deleteOrder,
 } from "./orders.controller";
+import { RateLimiterMiddleware } from "../middleware/rateLimiter"; // ✅ adjust path as needed
 
-const router = Router();
+export const orderRouter = Router();
 
-router.get("/orders", getOrders);
-router.get("/orders/:id", getOrderById);
-router.post("/orders", createOrder);
-router.put("/orders/:id", updateOrder);
-router.delete("/orders/:id", deleteOrder);
-
-export default router;
-
-
-
-
-
+// Apply rate limiting to all routes
+orderRouter.get("/orders", RateLimiterMiddleware, getOrders);
+orderRouter.get("/orders/:id", RateLimiterMiddleware, getOrderById);
+orderRouter.post("/orders", RateLimiterMiddleware, createOrder);
+orderRouter.put("/orders/:id", RateLimiterMiddleware, updateOrder);
+orderRouter.delete("/orders/:id", RateLimiterMiddleware, deleteOrder);
 
